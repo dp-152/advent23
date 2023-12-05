@@ -47,23 +47,43 @@ func (c *cubeset) parseVal(valstr string) {
 	}
 }
 
+func (c *cubeset) inflate(src *cubeset) {
+	if src.red > c.red {
+		c.red = src.red
+	}
+
+	if src.green > c.green {
+		c.green = src.green
+	}
+
+	if src.blue > c.blue {
+		c.blue = src.blue
+	}
+}
+
+func (c *cubeset) pow() int64 {
+	return c.red * c.green * c.blue
+}
+
 func main() {
-	var sum int64 = 0
+	var idxSum, powSum int64 = 0, 0
 
 	cancelChan := make(chan struct{})
 	fileChan := fs.ReadLines(fmt.Sprintf("%s/input.txt", path.OwnPath()), cancelChan)
 
 	for line := range fileChan {
-		index, overflow := parseGame(line)
+		index, overflow, pow := parseGame(line)
 		if !overflow {
-			sum += index
+			idxSum += index
 		}
+		powSum += pow
 	}
 
-	fmt.Printf("Sum of lines: %d\n", sum)
+	fmt.Printf("Sum of lines: %d\n", idxSum)
+	fmt.Printf("Sum of powers: %d\n", powSum)
 }
 
-func parseGame(line string) (index int64, overflow bool) {
+func parseGame(line string) (index int64, overflow bool, pow int64) {
 	game, ok := strings.CutPrefix(line, cGAME_PREFIX)
 	if !ok {
 		panic(fmt.Errorf("cannot parse game: prefix \"%s\" not found in line %s[...]", cGAME_PREFIX, line[:20]))
@@ -79,29 +99,35 @@ func parseGame(line string) (index int64, overflow bool) {
 		panic(err)
 	}
 
-	overflow = parseSets(game)
+	overflow, pow = parseSets(game)
 
 	return
 }
 
-func parseSets(game string) (overflow bool) {
+func parseSets(game string) (overflow bool, pow int64) {
+	minset := new(cubeset)
 	for _, setstr := range strings.Split(game, cSET_SEPARATOR) {
-		if parseVals(setstr) {
+		set, of := parseVals(setstr)
+		if of {
 			overflow = true
-			break
 		}
+
+		minset.inflate(set)
 	}
+	pow = minset.pow()
 
 	return
 }
 
-func parseVals(setstr string) (overflow bool) {
-	set := new(cubeset)
+func parseVals(setstr string) (set *cubeset, overflow bool) {
+	set = new(cubeset)
 	for _, valstr := range strings.Split(setstr, cVAL_SEPARATOR) {
 		set.parseVal(valstr)
 	}
 
-	return isSetOverflow(set)
+	overflow = isSetOverflow(set)
+
+	return
 }
 
 func isSetOverflow(set *cubeset) bool {
