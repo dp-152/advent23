@@ -1,5 +1,5 @@
 name: Pull Request
-run-name: Checking build and test status for  ${{ github.ref }}
+run-name: Checking build and test status for ${{ github.head_ref }}
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ jobs:
               pkg=$(go list "${d}")
 
               echo "Building ${pkg}..."
-              go build -o ${{ runner.temp }} "${d}"
+              go build -C -o ${{ runner.temp }} "${d}"
               echo "Done building ${pkg}"
 
               echo "Testing ${pkg}..."
