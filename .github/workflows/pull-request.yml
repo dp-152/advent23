@@ -1,0 +1,34 @@
+name: Pull Request
+run-name: Checking build and test status for  ${{ github.ref }}
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Golang ${{ vars.GOLANG_VERSION }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ vars.GOLANG_VERSION }}
+      - name: Build and test all packages
+        run: |
+          for d in ./day*; do
+            if [ -d "${d}" ] then;
+              pkg=$(go list "${d}")
+
+              echo "Building ${pkg}..."
+              go build -o ${{ runner.temp }} "${d}"
+              echo "Done building ${pkg}"
+
+              echo "Testing ${pkg}..."
+              go test -v "${d}"
+              echo "Done testing ${pkg}"
+            fi
+          done
