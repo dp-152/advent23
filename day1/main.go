@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/dp-152/advent23/common/fs"
-	"github.com/dp-152/advent23/common/path"
+	p "github.com/dp-152/advent23/common/path"
 )
 
 var nums = []string{"nil", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
@@ -21,16 +22,20 @@ func init() {
 }
 
 func main() {
-	sum := 0
+	sum := parseFile(path.Join(p.OwnPath(), "input.txt"))
 
+	fmt.Printf("Sum of lines: %d\n", sum)
+}
+
+func parseFile(inputFile string) (sum int) {
 	cancelChan := make(chan struct{})
-	fileChan := fs.ReadLines(fmt.Sprintf("%s/input.txt", path.OwnPath()), cancelChan)
+	fileChan := fs.ReadLines(inputFile, cancelChan)
 
 	for line := range fileChan {
 		sum += lineValue(line)
 	}
 
-	fmt.Printf("Sum of lines: %d\n", sum)
+	return
 }
 
 func lineValue(line string) int {
