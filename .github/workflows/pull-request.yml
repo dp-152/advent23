@@ -20,7 +20,7 @@ jobs:
       - name: Build and test all packages
         run: |
           for d in ./day*; do
-            if [ -d "${d}" ] then;
+            if [ -d "${d}" ]; then
               pkg=$(go list "${d}")
 
               echo "Building ${pkg}..."
