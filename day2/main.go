@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"path"
 	"strconv"
 	"strings"
 
 	"github.com/dp-152/advent23/common/fs"
-	"github.com/dp-152/advent23/common/path"
+	p "github.com/dp-152/advent23/common/path"
 )
 
 const cGAME_PREFIX = "Game "
@@ -66,10 +67,14 @@ func (c *cubeset) pow() int64 {
 }
 
 func main() {
-	var idxSum, powSum int64 = 0, 0
+	idxSum, powSum := parseFile(path.Join(p.OwnPath(), "input.txt"))
+	fmt.Printf("Sum of lines: %d\n", idxSum)
+	fmt.Printf("Sum of powers: %d\n", powSum)
+}
 
+func parseFile(inputFile string) (idxSum, powSum int64) {
 	cancelChan := make(chan struct{})
-	fileChan := fs.ReadLines(fmt.Sprintf("%s/input.txt", path.OwnPath()), cancelChan)
+	fileChan := fs.ReadLines(inputFile, cancelChan)
 
 	for line := range fileChan {
 		index, overflow, pow := parseGame(line)
@@ -78,9 +83,7 @@ func main() {
 		}
 		powSum += pow
 	}
-
-	fmt.Printf("Sum of lines: %d\n", idxSum)
-	fmt.Printf("Sum of powers: %d\n", powSum)
+	return
 }
 
 func parseGame(line string) (index int64, overflow bool, pow int64) {
