@@ -21,14 +21,14 @@ jobs:
         run: |
           for d in ./day*; do
             if [ -d "${d}" ]; then
-              pkg=$(go list "${d}")
+              pkg=$(go list -C "${d}")
 
               echo "Building ${pkg}..."
-              go build -C -o ${{ runner.temp }} "${d}"
+              go build -C "${d}" -o ${{ runner.temp }} 
               echo "Done building ${pkg}"
 
               echo "Testing ${pkg}..."
-              go test -v "${d}"
+              go test -C "${d}" -v
               echo "Done testing ${pkg}"
             fi
           done
