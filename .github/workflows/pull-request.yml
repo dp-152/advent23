@@ -1,5 +1,5 @@
 name: Pull Request
-run-name: Checking build and test status for  ${{ github.ref }}
+run-name: Checking build and test status for ${{ github.head_ref }}
 
 on:
   pull_request:
