@@ -90,6 +90,10 @@ func main() {
 	partsSum := sumPartNumbers(engine)
 
 	fmt.Printf("Sum of all parts: %d\n", partsSum)
+
+	grSum := sumGearRatios(engine)
+
+	fmt.Printf("Sum of gear ratios: %d\n", grSum)
 }
 
 func sumPartNumbers(engine *engineSchematic) (sum int) {
@@ -105,6 +109,30 @@ func sumPartNumbers(engine *engineSchematic) (sum int) {
 			}
 		}
 	}
+	return
+}
+
+func sumGearRatios(engine *engineSchematic) (sum int) {
+	gears := engine.GetBySymbol('*')
+
+	for _, gear := range gears {
+		adj := engine.GetAdjacent(gear)
+
+		pnCount := 0
+
+		ratio := 1
+		for _, adjPn := range adj {
+			if adjPn.itemType == eNUMBER {
+				ratio *= adjPn.itemValue
+				pnCount += 1
+			}
+		}
+
+		if pnCount == 2 {
+			sum += ratio
+		}
+	}
+
 	return
 }
 
